@@ -9,8 +9,6 @@ function MainComponent() {
 
     const getAllUsers = useCallback(async () => {
         let url = process.env.PRODUCTION || 'api'
-        let test = process.env.PRODUCTION
-        console.log(url, test)
         const data = await axios.get(`${process.env.PRODUCTION}/users/all`)
         setPlayers(data.data.rows.map(player => [player.username, player.user_id]))
     }, []);
