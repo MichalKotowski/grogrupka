@@ -8,7 +8,7 @@ function MainComponent() {
     const [playersWithRating, setPlayersRating] = useState([])
 
     const getAllUsers = useCallback(async () => {
-        console.log(process.env)
+        console.log(process.env, process.env.NODE_ENV, process.env.PRODUCTION)
         const url = process.env.PRODUCTION || 'api'
         const data = await axios.get(`${url}/users/all`)
         setPlayers(data.data.rows.map(player => [player.username, player.user_id]))
