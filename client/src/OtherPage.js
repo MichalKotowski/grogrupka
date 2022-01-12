@@ -22,14 +22,14 @@ class OtherPage extends Component {
     }
 
     getAllUsers = (async () => {
-        const data = await axios.get("https://grogrupka.herokuapp.com/api/users/all")
+        const data = await axios.get("https://grogrupka.herokuapp.com/users/all")
         this.setState({
             players: data.data.rows.map(player => [player.username, player.user_id])
         })
     })
 
     getCurrentElo = (async () => {
-        const data = await axios.get('https://grogrupka.herokuapp.com/api/elo/all')
+        const data = await axios.get('https://grogrupka.herokuapp.com/elo/all')
         this.setState({
             elo: data.data.rows.map(player => [player.user_id, player.current_elo])
         })
@@ -70,7 +70,7 @@ class OtherPage extends Component {
     }
 
     saveElo = (async (dataToPush) => {
-        await axios.post("https://grogrupka.herokuapp.com/api/elo", {
+        await axios.post("https://grogrupka.herokuapp.com/elo", {
             session: dataToPush
         }).then(response => {
             console.log(response)
@@ -82,7 +82,7 @@ class OtherPage extends Component {
     saveGame = (async event => {
         event.preventDefault()
 
-        await axios.post("https://grogrupka.herokuapp.com/api/game", {
+        await axios.post("https://grogrupka.herokuapp.com/game", {
             session: this.state
         }).then(response => {
             console.log(response)
