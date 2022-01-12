@@ -22,14 +22,16 @@ class OtherPage extends Component {
     }
 
     getAllUsers = (async () => {
-        const data = await axios.get("https://grogrupka.herokuapp.com/users/all")
+        const url = process.env.PRODUCTION ? 'https://grogrupka.herokuapp.com' : 'api'
+        const data = await axios.get(`${url}/users/all`)
         this.setState({
             players: data.data.rows.map(player => [player.username, player.user_id])
         })
     })
 
     getCurrentElo = (async () => {
-        const data = await axios.get('https://grogrupka.herokuapp.com/elo/all')
+        const url = process.env.PRODUCTION ? 'https://grogrupka.herokuapp.com' : 'api'
+        const data = await axios.get(`${url}/elo/all`)
         this.setState({
             elo: data.data.rows.map(player => [player.user_id, player.current_elo])
         })
@@ -58,9 +60,7 @@ class OtherPage extends Component {
             })
         })
 
-        console.log(selectedElo)
         const newElo = elo.getEloRating(selectedElo, 64)
-        console.log(newElo)
 
         players.forEach((player, i) => {
             dataToPush.push([parseInt(players[i][0]), parseInt(newElo[i])])
@@ -70,7 +70,8 @@ class OtherPage extends Component {
     }
 
     saveElo = (async (dataToPush) => {
-        await axios.post("https://grogrupka.herokuapp.com/elo", {
+        const url = process.env.PRODUCTION ? 'https://grogrupka.herokuapp.com' : 'api'
+        const data = await axios.get(`${url}/elo`, {
             session: dataToPush
         }).then(response => {
             console.log(response)
@@ -82,7 +83,8 @@ class OtherPage extends Component {
     saveGame = (async event => {
         event.preventDefault()
 
-        await axios.post("https://grogrupka.herokuapp.com/game", {
+        const url = process.env.PRODUCTION ? 'https://grogrupka.herokuapp.com' : 'api'
+        const data = await axios.get(`${url}/game`, {
             session: this.state
         }).then(response => {
             console.log(response)

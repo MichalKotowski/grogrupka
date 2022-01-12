@@ -8,13 +8,15 @@ function MainComponent() {
     const [playersWithRating, setPlayersRating] = useState([])
 
     const getAllUsers = useCallback(async () => {
-        const data = await axios.get("https://grogrupka.herokuapp.com/users/all");
-        setPlayers(data.data.rows.map(player => [player.username, player.user_id]));
+        const url = process.env.PRODUCTION ? 'https://grogrupka.herokuapp.com' : 'api'
+        const data = await axios.get(`${url}/users/all`)
+        setPlayers(data.data.rows.map(player => [player.username, player.user_id]))
     }, []);
 
     const getLatestElo = useCallback(async () => {
-        const data = await axios.get("https://grogrupka.herokuapp.com/elo/all");
-        setElo(data.data.rows.map(player => [player.user_id, player.current_elo]));
+        const url = process.env.PRODUCTION ? 'https://grogrupka.herokuapp.com' : 'api'
+        const data = await axios.get(`${url}/elo/all`)
+        setElo(data.data.rows.map(player => [player.user_id, player.current_elo]))
     }, []);
 
     const assignRatingToUser = () => {
@@ -39,10 +41,6 @@ function MainComponent() {
     useEffect(() => {
         assignRatingToUser()
     }, [players, elo])
-
-    console.log('first', eloo.getEloRating([1000, 1000, 1000, 1000, 1000], 64))
-    console.log('second', eloo.getEloRating([1000, 1026, 974, 1051, 949], 64))
-    console.log('third', eloo.getEloRating([1051, 907, 1047, 979, 1016], 64))
 
     return (
         <div>
