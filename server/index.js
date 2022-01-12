@@ -14,7 +14,10 @@ const pgClient = new Pool({
     host: keys.pgHost,
     database: keys.pgDatabase,
     password: keys.pgPassword,
-    port: keys.pgPort
+    port: keys.pgPort,
+    ssl: {
+        rejectUnauthorized: false,
+    }
 });
 
 app.post("/game", async (req, res) => {
@@ -67,6 +70,9 @@ app.get("/elo/all", async (req, res) => {
     res.send(playersElo)
 })
 
-app.listen(5000, err => {
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
     console.log("Listening");
-});
+}).on('error', err => {
+    console.log(err)
+})
