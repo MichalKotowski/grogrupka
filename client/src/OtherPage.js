@@ -22,7 +22,7 @@ class OtherPage extends Component {
     }
 
     getAllUsers = (async () => {
-        const url = process.env.PRODUCTION || 'api'
+        const url = process.env.REACT_APP_PRODUCTION || 'api'
         const data = await axios.get(`${url}/users/all`)
         this.setState({
             players: data.data.rows.map(player => [player.username, player.user_id])
@@ -30,7 +30,7 @@ class OtherPage extends Component {
     })
 
     getCurrentElo = (async () => {
-        const url = process.env.PRODUCTION || 'api'
+        const url = process.env.REACT_APP_PRODUCTION || 'api'
         const data = await axios.get(`${url}/elo/all`)
         this.setState({
             elo: data.data.rows.map(player => [player.user_id, player.current_elo])
@@ -70,7 +70,7 @@ class OtherPage extends Component {
     }
 
     saveElo = (async (dataToPush) => {
-        const url = process.env.PRODUCTION || 'api'
+        const url = process.env.REACT_APP_PRODUCTION || 'api'
         const data = await axios.get(`${url}/elo`, {
             session: dataToPush
         }).then(response => {
@@ -83,7 +83,7 @@ class OtherPage extends Component {
     saveGame = (async event => {
         event.preventDefault()
 
-        const url = process.env.PRODUCTION || 'api'
+        const url = process.env.REACT_APP_PRODUCTION || 'api'
         const data = await axios.get(`${url}/game`, {
             session: this.state
         }).then(response => {

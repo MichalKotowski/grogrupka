@@ -8,13 +8,13 @@ function MainComponent() {
     const [playersWithRating, setPlayersRating] = useState([])
 
     const getAllUsers = useCallback(async () => {
-        let url = process.env.PRODUCTION || 'api'
-        const data = await axios.get(`${process.env.PRODUCTION}/users/all`)
+        let url = process.env.REACT_APP_PRODUCTION || 'api'
+        const data = await axios.get(`${url}/users/all`)
         setPlayers(data.data.rows.map(player => [player.username, player.user_id]))
     }, []);
 
     const getLatestElo = useCallback(async () => {
-        const url = process.env.PRODUCTION || 'api'
+        const url = process.env.REACT_APP_PRODUCTION || 'api'
         const data = await axios.get(`${url}/elo/all`)
         setElo(data.data.rows.map(player => [player.user_id, player.current_elo]))
     }, []);
