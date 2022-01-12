@@ -8,12 +8,12 @@ function MainComponent() {
     const [playersWithRating, setPlayersRating] = useState([])
 
     const getAllUsers = useCallback(async () => {
-        const data = await axios.get("/api/users/all");
+        const data = await axios.get("https://grogrupka.herokuapp.com/api/users/all");
         setPlayers(data.data.rows.map(player => [player.username, player.user_id]));
     }, []);
 
     const getLatestElo = useCallback(async () => {
-        const data = await axios.get("/api/elo/all");
+        const data = await axios.get("https://grogrupka.herokuapp.com/api/elo/all");
         setElo(data.data.rows.map(player => [player.user_id, player.current_elo]));
     }, []);
 
