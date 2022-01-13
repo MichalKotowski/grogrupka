@@ -71,7 +71,7 @@ class OtherPage extends Component {
 
     saveElo = (async (dataToPush) => {
         const url = process.env.REACT_APP_PRODUCTION || 'api'
-        const data = await axios.get(`${url}/elo`, {
+        const data = await axios.post(`${url}/elo`, {
             session: dataToPush
         }).then(response => {
             console.log(response)
@@ -84,7 +84,7 @@ class OtherPage extends Component {
         event.preventDefault()
 
         const url = process.env.REACT_APP_PRODUCTION || 'api'
-        const data = await axios.get(`${url}/game`, {
+        const data = await axios.post(`${url}/game`, {
             session: this.state
         }).then(response => {
             console.log(response)
