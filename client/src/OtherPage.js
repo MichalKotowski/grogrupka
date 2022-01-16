@@ -2,6 +2,8 @@ import { Component } from "react"
 import { Link } from "react-router-dom"
 import * as elo from "./elo.js"
 import axios from "axios"
+import moment from 'moment'
+import { hasDuplicates } from "./utilities.js"
 
 class OtherPage extends Component {
     constructor(props) {
@@ -11,6 +13,7 @@ class OtherPage extends Component {
             elo: [],
             date: '',
             game: '',
+            invalid: false,
         }
 
         this.getAllUsers = this.getAllUsers.bind(this)
@@ -19,6 +22,8 @@ class OtherPage extends Component {
         this.handleInput = this.handleInput.bind(this)
         this.getCurrentElo = this.getCurrentElo.bind(this)
         this.saveElo = this.saveElo.bind(this)
+        this.verifyForm = this.verifyForm.bind(this)
+        this.refreshInputs = this.refreshInputs.bind(this)
     }
 
     getAllUsers = (async () => {
@@ -44,7 +49,7 @@ class OtherPage extends Component {
         const latestElo = this.state.elo
 
         for (const [key, value] of Object.entries(this.state)) {
-            if (key.includes('user')) {
+            if (key.includes('user') && value.length > 0) {
                 let userId = key.charAt(key.length - 1)
                 players.push([userId, value])
             }
@@ -69,12 +74,26 @@ class OtherPage extends Component {
         this.saveElo(dataToPush)
     }
 
+    refreshInputs = () => {
+        for (const [key, value] of Object.entries(this.state)) {
+            if (key.includes('user')) {
+                this.setState({
+                    [key]: ''
+                })
+            }
+        }
+        this.setState({
+            game: ''
+        })
+    }
+
     saveElo = (async (dataToPush) => {
         const url = process.env.REACT_APP_PRODUCTION || 'api'
-        const data = await axios.post(`${url}/elo`, {
+        await axios.post(`${url}/elo`, {
             session: dataToPush
         }).then(response => {
             console.log(response)
+            this.refreshInputs()
         }).catch(error => {
             console.log(error)
         })
@@ -82,21 +101,73 @@ class OtherPage extends Component {
 
     saveGame = (async event => {
         event.preventDefault()
-
         const url = process.env.REACT_APP_PRODUCTION || 'api'
-        const data = await axios.post(`${url}/game`, {
-            session: this.state
-        }).then(response => {
-            console.log(response)
-            this.handleRating()
-        }).catch(error => {
-            console.log(error)
-        })
+
+        if (this.verifyForm()) {
+            await axios.post(`${url}/game`, {
+                session: this.state
+            }).then(response => {
+                console.log(response)
+                this.handleRating()
+            }).catch(error => {
+                console.log(error)
+            })
+        }
     })
+
+    verifyForm = () => {
+        let arePlayersInputsValid = true
+        let selectedPlayers = []
+        let possiblePlacements = []
+        const isDateValid = moment(this.state.date, 'YYYY-MM-DD', true).isValid()
+
+        for (const [key, placement] of Object.entries(this.state)) {
+            if (key.includes('user') && placement.length > 0) {
+                selectedPlayers.push(placement)
+            }
+        }
+
+        if (selectedPlayers.length < 2) {
+            arePlayersInputsValid = false
+        }
+
+        for (let i = 1; i <= selectedPlayers.length; i++) {
+            possiblePlacements.push(i)
+        }
+
+        selectedPlayers.forEach(player => {
+            arePlayersInputsValid = !hasDuplicates(possiblePlacements)
+            possiblePlacements.forEach((place, i) => {
+                if (parseInt(player) === place) {
+                    possiblePlacements.splice(i, 1)
+                }
+            })
+        })
+
+        if (possiblePlacements.length !== 0) {
+            arePlayersInputsValid = false
+        }
+
+        if (isDateValid && this.state.game.length > 0 && arePlayersInputsValid) {
+            this.setState({
+                invalid: false
+            })
+            return true
+        } else {
+            this.setState({
+                invalid: true
+            })
+        }
+    }
 
     componentDidMount() {
         this.getAllUsers()
         this.getCurrentElo()
+
+        const date = moment(new Date()).format('YYYY-MM-DD')
+        this.setState({
+            date: date
+        })
     }
 
     handleInput = name => event => {
@@ -113,14 +184,24 @@ class OtherPage extends Component {
                         {this.state.players.map(player => (
                             <label key={player[1]}>
                                 {player[0]}
-                                <input type="text" pattern="[0-9]*" onChange={this.handleInput(`user${player[1]}`)} />
+                                <select onChange={this.handleInput(`user${player[1]}`)} value={this.state[`user${player[1]}`]}>
+                                    <option value="" disabled selected>Select position</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                </select>
                             </label>
                         ))}
                     </div>
                     <div className="inputs-wrapper">
                         <label>
                             Date
-                            <input type="text" value={this.state.date} onChange={this.handleInput(`date`)} />
+                            <input type="text" value={this.state.date} onChange={this.handleInput(`date`)} placeholder={this.state.date} />
                         </label>
                         <label>
                             Game
@@ -128,6 +209,18 @@ class OtherPage extends Component {
                         </label>
                     </div>
                     <input type="submit" value="Submit" />
+                    {this.state.invalid &&
+                        <div class="error">
+                            <div className="error__pill">Error</div>
+                            <p>Your form submit couldn't be processed properly. Check inputs for any obvious errors. Remember that:</p>
+                            <ul>
+                                <li><p>Ties are not valid, every place should be unique</p></li>
+                                <li><p>You have to select placements for at least 2 players</p></li>
+                                <li><p>Game name is required</p></li>
+                                <li><p>Date is required and has to be fit the 'YYYY-MM-DD' format</p></li>
+                            </ul>
+                        </div>
+                    }
                 </form>
             </div>
         )

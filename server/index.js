@@ -15,9 +15,9 @@ const pgClient = new Pool({
     database: keys.pgDatabase,
     password: keys.pgPassword,
     port: keys.pgPort,
-    ssl: {
-        rejectUnauthorized: false,
-    }
+    // ssl: {
+    //     rejectUnauthorized: false,
+    // }
 });
 
 app.post("/game", async (req, res) => {
@@ -33,7 +33,7 @@ app.post("/game", async (req, res) => {
     pgClient.query(`INSERT INTO games(game_id, date, game_name) VALUES (${latestGameId}, '${session.date}', '${session.game}')`)
 
     for (const [key, placement] of Object.entries(session)) {
-        if (key.includes('user')) {
+        if (key.includes('user') & placement.length > 0) {
             let userId = key.charAt(key.length - 1)
             pgClient.query(`INSERT INTO placement(game_id, user_id, placement) VALUES (${latestGameId}, ${userId}, ${placement})`)
         }

@@ -13,3 +13,15 @@ input {
 .header a {
     margin-right: 15px;
 }
+
+.error {
+    margin-top: 60px;
+}
+
+.error__pill {
+    background-color: #ab0000;
+    border-radius: 6px;
+    padding: 0.5em 1em;
+    display: inline-block;
+    color: black;
+}
